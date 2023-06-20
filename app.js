@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const MONGODB_URI = "mongodb://localhost:27017/mestodb";
-const { PORT = 3000 } = process.env;
+const {PORT = 3000} = process.env;
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use((req, res, next) => {
   req.user = {
-    _id: '',
+    _id: '64917d99ceb0b6d31c99d5b0',
   };
 
   next();

@@ -31,10 +31,12 @@ module.exports.getUserById = (req, res) => {
 // 400 - Переданы некорректные данные при создании пользователя.
 // 500 - Ошибка по умолчанию.
 module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {name, about, avatar} = req.body;
 
-  User.create({ name, about, avatar })
-    .then(user => res.send({ data: user }))
+  User.create({name, about, avatar})
+    .then(user => {
+      res.send(user);
+    })
     .catch(err => {
       res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
     });
@@ -44,12 +46,12 @@ module.exports.postUser = (req, res) => {
 // 404 - Пользователь с указанным _id не найден.
 // 500 - Ошибка по умолчанию.
 module.exports.updateUser = (req, res) => {
-  const { name, about } = req.body;
+  const {name, about} = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
-    { new: true, runValidators: true }
+    {name, about},
+    {new: true, runValidators: true}
   )
     .then(user => {
       res.send(user);
@@ -63,12 +65,12 @@ module.exports.updateUser = (req, res) => {
 // 404 - Пользователь с указанным _id не найден.
 // 500 - Ошибка по умолчанию.
 module.exports.updateAvatar = (req, res) => {
-  const { avatar } = req.body;
+  const {avatar} = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { avatar },
-    { new: true, runValidators: true }
+    {avatar},
+    {new: true, runValidators: true}
   )
     .then(user => {
       res.send(user);

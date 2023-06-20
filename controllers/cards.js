@@ -4,6 +4,7 @@ const {errorBody, DEFAULT_SERVER_ERROR} = require("../utils/errors");
 // 500 - Ошибка по умолчанию.
 module.exports.getCards = (req, res) => {
   Card.find({})
+    .populate('user')
     .then(cards => {
       res.send(cards);
     })
@@ -15,9 +16,9 @@ module.exports.getCards = (req, res) => {
 // 400 - Переданы некорректные данные при создании карточки.
 // 500 - Ошибка по умолчанию.
 module.exports.postCard = (req, res) => {
-  const { name, link, owner, likes, createdAt } = req.body;
+  const {name, link, owner, likes, createdAt} = req.body;
 
-  Card.create({ name, link, owner, likes, createdAt })
+  Card.create({name, link, owner, likes, createdAt})
     .then(card => {
       res.send(card);
     })
@@ -30,7 +31,8 @@ module.exports.postCard = (req, res) => {
 // 500 - Ошибка по умолчанию.
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then( card => res.send(card))
+    .populate('user')
+    .then(card => res.send(card))
     .catch(err => {
       res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
     });
@@ -42,9 +44,10 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true }
+    {$addToSet: {likes: req.user._id}},
+    {new: true, runValidators: true}
   )
+    .populate('user')
     .then(card => res.send(card))
     .catch(err => {
       res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
@@ -57,10 +60,13 @@ module.exports.likeCard = (req, res) => {
 module.exports.unlikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true }
+    {$pull: {likes: req.user._id}},
+    {new: true, runValidators: true}
   )
-    .then( card => { res.send(card)})
+    .populate('user')
+    .then(card => {
+      res.send(card)
+    })
     .catch(err => {
       res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
     })
