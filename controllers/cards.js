@@ -1,29 +1,37 @@
 const Card = require('../models/card');
-const {errorBody, DEFAULT_SERVER_ERROR} = require("../utils/errors");
+const {
+  errorBody,
+  DEFAULT_ERROR_MESSAGE,
+  INTERNAL_SERVER_ERROR,
+} = require('../utils/errors');
 
 // 500 - Ошибка по умолчанию.
 module.exports.getCards = (req, res) => {
   Card.find({})
     .populate('user')
-    .then(cards => {
+    .then((cards) => {
       res.send(cards);
     })
-    .catch(err => {
-      res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
+    .catch((err) => {
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
 
 // 400 - Переданы некорректные данные при создании карточки.
 // 500 - Ошибка по умолчанию.
 module.exports.postCard = (req, res) => {
-  const {name, link, owner, likes, createdAt} = req.body;
+  const {
+    name, link, owner, likes, createdAt,
+  } = req.body;
 
-  Card.create({name, link, owner, likes, createdAt})
-    .then(card => {
+  Card.create({
+    name, link, owner, likes, createdAt,
+  })
+    .then((card) => {
       res.send(card);
     })
-    .catch(err => {
-      res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
+    .catch((err) => {
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
 
@@ -32,9 +40,9 @@ module.exports.postCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .populate('user')
-    .then(card => res.send(card))
-    .catch(err => {
-      res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
+    .then((card) => res.send(card))
+    .catch((err) => {
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
 
@@ -44,13 +52,13 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {$addToSet: {likes: req.user._id}},
-    {new: true, runValidators: true}
+    { $addToSet: { likes: req.user._id } },
+    { new: true, runValidators: true },
   )
     .populate('user')
-    .then(card => res.send(card))
-    .catch(err => {
-      res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
+    .then((card) => res.send(card))
+    .catch((err) => {
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
 
@@ -60,14 +68,14 @@ module.exports.likeCard = (req, res) => {
 module.exports.unlikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {$pull: {likes: req.user._id}},
-    {new: true, runValidators: true}
+    { $pull: { likes: req.user._id } },
+    { new: true, runValidators: true },
   )
     .populate('user')
-    .then(card => {
-      res.send(card)
+    .then((card) => {
+      res.send(card);
     })
-    .catch(err => {
-      res.status(500).send(errorBody(DEFAULT_SERVER_ERROR));
-    })
+    .catch((err) => {
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+    });
 };
