@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
-const MONGODB_URI = 'mongodb://localhost:27017/mestodb';
 const { PORT = 3000 } = process.env;
 const app = express();
 
@@ -16,11 +15,13 @@ app.use((req, res, next) => {
   next();
 });
 
-mongoose.connect(MONGODB_URI);
+mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
 app.listen(PORT, () => {
+  /* eslint-disable no-console */
   console.log(`Server on port ${PORT} started...`);
+  /* eslint-enable no-console */
 });

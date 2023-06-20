@@ -34,7 +34,7 @@ module.exports.getUserById = (req, res) => {
       }
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
