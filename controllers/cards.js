@@ -1,4 +1,4 @@
-const { ValidationError } = require('mongoose').Error;
+const { CastError, ValidationError } = require('mongoose').Error;
 const Card = require('../models/card');
 const {
   errorBody,
@@ -53,14 +53,14 @@ module.exports.deleteCard = (req, res) => {
     .populate(['owner', 'likes'])
     .orFail()
     .then((card) => {
-      if (card) {
-        res.send(card);
-      } else {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
-      }
+      res.send(card);
     })
-    .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+    .catch((err) => {
+      if (err instanceof CastError) {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+      }
     });
 };
 
@@ -79,12 +79,14 @@ module.exports.likeCard = (req, res) => {
     .populate(['owner', 'likes'])
     .orFail()
     .then((card) => {
-      if (card) {
-        res.send(card);
-      } else { res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE)); }
+      res.send(card);
     })
-    .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+    .catch((err) => {
+      if (err instanceof CastError) {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+      }
     });
 };
 
@@ -103,13 +105,13 @@ module.exports.unlikeCard = (req, res) => {
     .populate(['owner', 'likes'])
     .orFail()
     .then((card) => {
-      if (card) {
-        res.send(card);
-      } else {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
-      }
+      res.send(card);
     })
-    .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+    .catch((err) => {
+      if (err instanceof CastError) {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+      }
     });
 };

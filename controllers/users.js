@@ -1,4 +1,4 @@
-const { ValidationError } = require('mongoose').Error;
+const { CastError, ValidationError } = require('mongoose').Error;
 const User = require('../models/user');
 const {
   errorBody,
@@ -32,9 +32,10 @@ module.exports.getUserById = (req, res) => {
   User.findById(userId)
     .orFail()
     .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err instanceof CastError) {
         res
           .status(404)
           .send(
@@ -42,10 +43,9 @@ module.exports.getUserById = (req, res) => {
               `Пользователь по указанному ${req.params.userId} не найден.`,
             ),
           );
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
       }
-    })
-    .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
@@ -81,14 +81,12 @@ module.exports.updateUser = (req, res) => {
   )
     .orFail()
     .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
-      }
+      res.send(user);
     })
     .catch((err) => {
-      if (err instanceof ValidationError) {
+      if (err instanceof CastError) {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      } else if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
         res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
@@ -108,14 +106,12 @@ module.exports.updateAvatar = (req, res) => {
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .orFail()
     .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
-      }
+      res.send(user);
     })
     .catch((err) => {
-      if (err instanceof ValidationError) {
+      if (err instanceof CastError) {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      } else if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
         res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
