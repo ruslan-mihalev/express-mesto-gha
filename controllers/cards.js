@@ -1,10 +1,11 @@
 const Card = require('../models/card');
 const {
   errorBody,
-  DEFAULT_ERROR_MESSAGE,
-  INTERNAL_SERVER_ERROR,
   BAD_REQUEST,
   BAD_REQUEST_ERROR_MESSAGE,
+  INTERNAL_SERVER_ERROR,
+  INTERNAL_SERVER_ERROR_MESSAGE,
+  MONGO_VALIDATION_ERROR_NAME,
 } = require('../utils/errors');
 const { isValidObjectId } = require('../utils/validators');
 
@@ -17,7 +18,7 @@ module.exports.getCards = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
@@ -37,9 +38,11 @@ module.exports.postCard = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      if (err instanceof ValidationError) {
+      if (err.name === MONGO_VALIDATION_ERROR_NAME) {
+        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
       }
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
 
@@ -57,7 +60,7 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
@@ -80,7 +83,7 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
@@ -105,6 +108,6 @@ module.exports.unlikeCard = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };

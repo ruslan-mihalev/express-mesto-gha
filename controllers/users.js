@@ -1,10 +1,11 @@
 const User = require('../models/user');
 const {
   errorBody,
-  DEFAULT_ERROR_MESSAGE,
-  INTERNAL_SERVER_ERROR,
   BAD_REQUEST,
   BAD_REQUEST_ERROR_MESSAGE,
+  INTERNAL_SERVER_ERROR,
+  INTERNAL_SERVER_ERROR_MESSAGE,
+  MONGO_VALIDATION_ERROR_NAME,
 } = require('../utils/errors');
 const { isValidObjectId } = require('../utils/validators');
 
@@ -16,7 +17,7 @@ module.exports.getUsers = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
@@ -41,7 +42,7 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
@@ -56,7 +57,11 @@ module.exports.postUser = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      if (err.name === MONGO_VALIDATION_ERROR_NAME) {
+        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+      }
     });
 };
 
@@ -82,7 +87,11 @@ module.exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      if (err.name === MONGO_VALIDATION_ERROR_NAME) {
+        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+      }
     });
 };
 
@@ -104,6 +113,10 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       console.log(`err: ${err}`);
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
+      if (err.name === MONGO_VALIDATION_ERROR_NAME) {
+        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+      } else {
+        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+      }
     });
 };
