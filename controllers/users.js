@@ -3,7 +3,10 @@ const {
   errorBody,
   DEFAULT_ERROR_MESSAGE,
   INTERNAL_SERVER_ERROR,
+  BAD_REQUEST,
+  BAD_REQUEST_ERROR_MESSAGE,
 } = require('../utils/errors');
+const { isValidObjectId } = require('../utils/validators');
 
 // 500 - Ошибка по умолчанию.
 module.exports.getUsers = (req, res) => {
@@ -12,6 +15,7 @@ module.exports.getUsers = (req, res) => {
       res.send(users);
     })
     .catch((err) => {
+      console.log(`err: ${err}`);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
@@ -19,7 +23,9 @@ module.exports.getUsers = (req, res) => {
 // 404 - Пользователь по указанному _id не найден.
 // 500 - Ошибка по умолчанию.
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
+  const { userId } = req.params;
+
+  User.findById(userId)
     .then((user) => {
       if (user) {
         res.send(user);
@@ -34,7 +40,7 @@ module.exports.getUserById = (req, res) => {
       }
     })
     .catch((err) => {
-      //console.log(err);
+      console.log(`err: ${err}`);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
@@ -49,6 +55,7 @@ module.exports.postUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
+      console.log(`err: ${err}`);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
@@ -57,10 +64,16 @@ module.exports.postUser = (req, res) => {
 // 404 - Пользователь с указанным _id не найден.
 // 500 - Ошибка по умолчанию.
 module.exports.updateUser = (req, res) => {
+  const userId = req.user._id;
+  if (!userId || !isValidObjectId(userId)) {
+    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    return;
+  }
+
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
-    req.user._id,
+    userId,
     { name, about },
     { new: true, runValidators: true },
   )
@@ -68,6 +81,7 @@ module.exports.updateUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
+      console.log(`err: ${err}`);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
@@ -76,17 +90,20 @@ module.exports.updateUser = (req, res) => {
 // 404 - Пользователь с указанным _id не найден.
 // 500 - Ошибка по умолчанию.
 module.exports.updateAvatar = (req, res) => {
+  const userId = req.user._id;
+  if (!userId || !isValidObjectId(userId)) {
+    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    return;
+  }
+
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    { new: true, runValidators: true },
-  )
+  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
+      console.log(`err: ${err}`);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(DEFAULT_ERROR_MESSAGE));
     });
 };
