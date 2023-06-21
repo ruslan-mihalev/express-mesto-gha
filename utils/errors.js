@@ -4,7 +4,7 @@ const INTERNAL_SERVER_ERROR = 500;
 
 const BAD_REQUEST_ERROR_MESSAGE = 'Переданы некорректные данные';
 const NOT_FOUND_ERROR_MESSAGE = 'Объект не найден';
-const INTERNAL_SERVER_ERROR_MESSAGE = 'Ошибка сервера';
+const INTERNAL_SERVER_ERROR_MESSAGE = 'На сервере произошла ошибка';
 
 const MONGO_VALIDATION_ERROR_NAME = 'ValidationError';
 
