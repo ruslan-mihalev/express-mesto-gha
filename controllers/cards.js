@@ -23,13 +23,12 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.postCard = (req, res) => {
-  const { name, link, likes = [] } = req.body;
+  const { name, link } = req.body;
 
   Card.create({
     name,
     link,
     owner: req.user._id,
-    likes,
   })
     .then((card) => {
       res.send(card);
