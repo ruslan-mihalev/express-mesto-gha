@@ -56,7 +56,6 @@ module.exports.deleteCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      console.log(`err: ${err}, ${err.constructor}`);
       if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else {
@@ -83,7 +82,6 @@ module.exports.likeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      console.log(`err: ${err}, ${err.constructor}`);
       if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else {
@@ -110,7 +108,6 @@ module.exports.unlikeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      console.log(`err: ${err}, ${err.constructor}`);
       if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else {
