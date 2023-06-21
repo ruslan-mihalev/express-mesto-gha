@@ -6,6 +6,8 @@ const {
   INTERNAL_SERVER_ERROR,
   INTERNAL_SERVER_ERROR_MESSAGE,
   MONGO_VALIDATION_ERROR_NAME,
+  NOT_FOUND_ERROR,
+  NOT_FOUND_ERROR_MESSAGE,
 } = require('../utils/errors');
 const { isValidObjectId } = require('../utils/validators');
 
@@ -25,6 +27,11 @@ module.exports.getUsers = (req, res) => {
 // 500 - Ошибка по умолчанию.
 module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
+
+  if (!userId || !isValidObjectId(userId)) {
+    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    return;
+  }
 
   User.findById(userId)
     .then((user) => {
@@ -83,7 +90,11 @@ module.exports.updateUser = (req, res) => {
     { new: true, runValidators: true },
   )
     .then((user) => {
-      res.send(user);
+      if (user) {
+        res.send(user);
+      } else {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      }
     })
     .catch((err) => {
       console.log(`err: ${err}`);
@@ -109,7 +120,11 @@ module.exports.updateAvatar = (req, res) => {
 
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
-      res.send(user);
+      if (user) {
+        res.send(user);
+      } else {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      }
     })
     .catch((err) => {
       console.log(`err: ${err}`);

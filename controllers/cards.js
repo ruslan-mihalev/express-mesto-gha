@@ -6,6 +6,8 @@ const {
   INTERNAL_SERVER_ERROR,
   INTERNAL_SERVER_ERROR_MESSAGE,
   MONGO_VALIDATION_ERROR_NAME,
+  NOT_FOUND_ERROR,
+  NOT_FOUND_ERROR_MESSAGE,
 } = require('../utils/errors');
 const { isValidObjectId } = require('../utils/validators');
 
@@ -80,7 +82,11 @@ module.exports.likeCard = (req, res) => {
     { new: true, runValidators: true },
   )
     .populate(['owner', 'likes'])
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (card) {
+        res.send(card);
+      } else { res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE)); }
+    })
     .catch((err) => {
       console.log(`err: ${err}`);
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
@@ -104,7 +110,11 @@ module.exports.unlikeCard = (req, res) => {
   )
     .populate(['owner', 'likes'])
     .then((card) => {
-      res.send(card);
+      if (card) {
+        res.send(card);
+      } else {
+        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+      }
     })
     .catch((err) => {
       console.log(`err: ${err}`);
