@@ -1,3 +1,4 @@
+const { ValidationError } = require('mongoose').Error;
 const Card = require('../models/card');
 const {
   errorBody,
@@ -5,7 +6,6 @@ const {
   BAD_REQUEST_ERROR_MESSAGE,
   INTERNAL_SERVER_ERROR,
   INTERNAL_SERVER_ERROR_MESSAGE,
-  MONGO_VALIDATION_ERROR_NAME,
   NOT_FOUND_ERROR,
   NOT_FOUND_ERROR_MESSAGE,
 } = require('../utils/errors');
@@ -34,7 +34,7 @@ module.exports.postCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err.name === MONGO_VALIDATION_ERROR_NAME) {
+      if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
         res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));

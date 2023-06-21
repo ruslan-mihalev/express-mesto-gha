@@ -6,8 +6,6 @@ const BAD_REQUEST_ERROR_MESSAGE = 'Переданы некорректные д�
 const NOT_FOUND_ERROR_MESSAGE = 'Объект не найден';
 const INTERNAL_SERVER_ERROR_MESSAGE = 'На сервере произошла ошибка';
 
-const MONGO_VALIDATION_ERROR_NAME = 'ValidationError';
-
 const errorBody = (msg) => ({
   message: msg,
 });
@@ -20,5 +18,4 @@ module.exports = {
   INTERNAL_SERVER_ERROR_MESSAGE,
   NOT_FOUND_ERROR,
   NOT_FOUND_ERROR_MESSAGE,
-  MONGO_VALIDATION_ERROR_NAME,
 };
