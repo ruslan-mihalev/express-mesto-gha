@@ -51,6 +51,7 @@ module.exports.deleteCard = (req, res) => {
 
   Card.findByIdAndRemove(cardId)
     .populate(['owner', 'likes'])
+    .orFail()
     .then((card) => {
       if (card) {
         res.send(card);
@@ -76,6 +77,7 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .populate(['owner', 'likes'])
+    .orFail()
     .then((card) => {
       if (card) {
         res.send(card);
@@ -99,6 +101,7 @@ module.exports.unlikeCard = (req, res) => {
     { new: true },
   )
     .populate(['owner', 'likes'])
+    .orFail()
     .then((card) => {
       if (card) {
         res.send(card);

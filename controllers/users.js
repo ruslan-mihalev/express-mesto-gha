@@ -30,6 +30,7 @@ module.exports.getUserById = (req, res) => {
   }
 
   User.findById(userId)
+    .orFail()
     .then((user) => {
       if (user) {
         res.send(user);
@@ -78,6 +79,7 @@ module.exports.updateUser = (req, res) => {
     { name, about },
     { new: true, runValidators: true },
   )
+    .orFail()
     .then((user) => {
       if (user) {
         res.send(user);
@@ -104,6 +106,7 @@ module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
+    .orFail()
     .then((user) => {
       if (user) {
         res.send(user);
