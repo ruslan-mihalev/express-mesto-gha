@@ -73,7 +73,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .populate(['owner', 'likes'])
     .then((card) => {
@@ -96,7 +96,7 @@ module.exports.unlikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .populate(['owner', 'likes'])
     .then((card) => {
