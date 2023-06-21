@@ -11,21 +11,17 @@ const {
 } = require('../utils/errors');
 const { isValidObjectId } = require('../utils/validators');
 
-// 500 - Ошибка по умолчанию.
 module.exports.getCards = (req, res) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => {
       res.send(cards);
     })
-    .catch((err) => {
-      console.log(`err: ${err}`);
+    .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
-// 400 - Переданы некорректные данные при создании карточки.
-// 500 - Ошибка по умолчанию.
 module.exports.postCard = (req, res) => {
   const { name, link, likes = [] } = req.body;
 
@@ -39,7 +35,6 @@ module.exports.postCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      console.log(`err: ${err}`);
       if (err.name === MONGO_VALIDATION_ERROR_NAME) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
@@ -48,8 +43,6 @@ module.exports.postCard = (req, res) => {
     });
 };
 
-// 404 - Карточка с указанным _id не найдена.
-// 500 - Ошибка по умолчанию.
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   if (!cardId || !isValidObjectId(cardId)) {
@@ -66,15 +59,11 @@ module.exports.deleteCard = (req, res) => {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       }
     })
-    .catch((err) => {
-      console.log(`err: ${err}`);
+    .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
-// 400 - Переданы некорректные данные для постановки/снятии лайка.
-// 404 - Передан несуществующий _id карточки.
-// 500 - Ошибка по умолчанию.
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
   if (!cardId || !isValidObjectId(cardId)) {
@@ -93,15 +82,11 @@ module.exports.likeCard = (req, res) => {
         res.send(card);
       } else { res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE)); }
     })
-    .catch((err) => {
-      console.log(`err: ${err}`);
+    .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
-// 400 - Переданы некорректные данные для постановки/снятии лайка.
-// 404 - Передан несуществующий _id карточки.
-// 500 - Ошибка по умолчанию.
 module.exports.unlikeCard = (req, res) => {
   const { cardId } = req.params;
   if (!cardId || !isValidObjectId(cardId)) {
@@ -122,8 +107,7 @@ module.exports.unlikeCard = (req, res) => {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       }
     })
-    .catch((err) => {
-      console.log(`err: ${err}`);
+    .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };

@@ -11,20 +11,16 @@ const {
 } = require('../utils/errors');
 const { isValidObjectId } = require('../utils/validators');
 
-// 500 - Ошибка по умолчанию.
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => {
       res.send(users);
     })
-    .catch((err) => {
-      console.log(`err: ${err}`);
+    .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
-// 404 - Пользователь по указанному _id не найден.
-// 500 - Ошибка по умолчанию.
 module.exports.getUserById = (req, res) => {
   const { userId } = req.params;
 
@@ -47,14 +43,11 @@ module.exports.getUserById = (req, res) => {
           );
       }
     })
-    .catch((err) => {
-      console.log(`err: ${err}`);
+    .catch(() => {
       res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
     });
 };
 
-// 400 - Переданы некорректные данные при создании пользователя.
-// 500 - Ошибка по умолчанию.
 module.exports.postUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
@@ -63,7 +56,6 @@ module.exports.postUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      console.log(`err: ${err}`);
       if (err.name === MONGO_VALIDATION_ERROR_NAME) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
@@ -72,9 +64,6 @@ module.exports.postUser = (req, res) => {
     });
 };
 
-// 400 - Переданы некорректные данные при обновлении профиля.
-// 404 - Пользователь с указанным _id не найден.
-// 500 - Ошибка по умолчанию.
 module.exports.updateUser = (req, res) => {
   const userId = req.user._id;
   if (!userId || !isValidObjectId(userId)) {
@@ -97,7 +86,6 @@ module.exports.updateUser = (req, res) => {
       }
     })
     .catch((err) => {
-      console.log(`err: ${err}`);
       if (err.name === MONGO_VALIDATION_ERROR_NAME) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
@@ -106,9 +94,6 @@ module.exports.updateUser = (req, res) => {
     });
 };
 
-// 400 - Переданы некорректные данные при обновлении аватара.
-// 404 - Пользователь с указанным _id не найден.
-// 500 - Ошибка по умолчанию.
 module.exports.updateAvatar = (req, res) => {
   const userId = req.user._id;
   if (!userId || !isValidObjectId(userId)) {
@@ -127,7 +112,6 @@ module.exports.updateAvatar = (req, res) => {
       }
     })
     .catch((err) => {
-      console.log(`err: ${err}`);
       if (err.name === MONGO_VALIDATION_ERROR_NAME) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
       } else {
