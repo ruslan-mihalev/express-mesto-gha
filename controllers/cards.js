@@ -1,4 +1,4 @@
-const { CastError, ValidationError } = require('mongoose').Error;
+const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const Card = require('../models/card');
 const {
   errorBody,
@@ -56,7 +56,8 @@ module.exports.deleteCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err instanceof CastError) {
+      console.log(`err: ${err}, ${err.constructor}`);
+      if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else {
         res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
@@ -82,7 +83,8 @@ module.exports.likeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err instanceof CastError) {
+      console.log(`err: ${err}, ${err.constructor}`);
+      if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else {
         res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
@@ -108,7 +110,8 @@ module.exports.unlikeCard = (req, res) => {
       res.send(card);
     })
     .catch((err) => {
-      if (err instanceof CastError) {
+      console.log(`err: ${err}, ${err.constructor}`);
+      if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else {
         res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));

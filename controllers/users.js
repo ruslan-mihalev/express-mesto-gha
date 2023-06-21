@@ -1,4 +1,4 @@
-const { CastError, ValidationError } = require('mongoose').Error;
+const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const User = require('../models/user');
 const {
   errorBody,
@@ -35,7 +35,7 @@ module.exports.getUserById = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof CastError) {
+      if (err instanceof DocumentNotFoundError) {
         res
           .status(404)
           .send(
@@ -84,7 +84,7 @@ module.exports.updateUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof CastError) {
+      if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
@@ -109,7 +109,7 @@ module.exports.updateAvatar = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof CastError) {
+      if (err instanceof DocumentNotFoundError) {
         res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
       } else if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
