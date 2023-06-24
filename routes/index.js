@@ -3,7 +3,7 @@ const {
   NOT_FOUND_ERROR,
   errorBody,
   NOT_FOUND_ERROR_MESSAGE,
-} = require('../utils/errors');
+} = require('../middlewares/errors');
 
 router.use('/cards', require('./cards'));
 router.use('/users', require('./users'));

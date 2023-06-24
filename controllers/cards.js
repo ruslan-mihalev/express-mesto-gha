@@ -1,28 +1,24 @@
 const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const Card = require('../models/card');
 const {
-  errorBody,
-  BAD_REQUEST,
-  BAD_REQUEST_ERROR_MESSAGE,
-  INTERNAL_SERVER_ERROR,
-  INTERNAL_SERVER_ERROR_MESSAGE,
-  NOT_FOUND_ERROR,
-  NOT_FOUND_ERROR_MESSAGE,
-} = require('../utils/errors');
+  InternalServerError, BadRequestError, NotFoundError, ForbiddenError,
+} = require('../middlewares/errors');
 const { isValidObjectId } = require('../utils/validators');
+const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => {
       res.send(cards);
     })
     .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
-    });
+      throw new InternalServerError();
+    })
+    .catch(next);
 };
 
-module.exports.postCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({
@@ -31,43 +27,57 @@ module.exports.postCard = (req, res) => {
     owner: req.user._id,
   })
     .then((card) => {
-      res.send(card);
+      res.status(HTTP_CODE_CREATED).send(card);
     })
     .catch((err) => {
       if (err instanceof ValidationError) {
-        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+        throw new BadRequestError();
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
+  const { _id: userId } = req.user;
   const { cardId } = req.params;
+
   if (!cardId || !isValidObjectId(cardId)) {
-    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    next(new BadRequestError());
     return;
   }
 
-  Card.findByIdAndRemove(cardId)
+  Card.findById(cardId)
     .populate(['owner', 'likes'])
     .orFail()
+    .then((card) => {
+      const { owner: { _id: ownerId } } = card;
+      if (ownerId.equals(userId)) {
+        return Card.deleteOne({ _id: cardId }).then(() => card);
+      }
+
+      throw new ForbiddenError();
+    })
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+        throw new NotFoundError();
+      } else if (err instanceof ForbiddenError) {
+        throw err;
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
   if (!cardId || !isValidObjectId(cardId)) {
-    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    next(new BadRequestError());
     return;
   }
 
@@ -83,17 +93,18 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+        throw new NotFoundError();
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.unlikeCard = (req, res) => {
+module.exports.unlikeCard = (req, res, next) => {
   const { cardId } = req.params;
   if (!cardId || !isValidObjectId(cardId)) {
-    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    next(new BadRequestError());
     return;
   }
 
@@ -109,9 +120,10 @@ module.exports.unlikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+        throw new NotFoundError();
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };

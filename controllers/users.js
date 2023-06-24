@@ -1,31 +1,30 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const User = require('../models/user');
 const {
-  errorBody,
-  BAD_REQUEST,
-  BAD_REQUEST_ERROR_MESSAGE,
-  INTERNAL_SERVER_ERROR,
-  INTERNAL_SERVER_ERROR_MESSAGE,
-  NOT_FOUND_ERROR,
-  NOT_FOUND_ERROR_MESSAGE,
-} = require('../utils/errors');
+  InternalServerError, NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
+} = require('../middlewares/errors');
+
 const { isValidObjectId } = require('../utils/validators');
 
-module.exports.getUsers = (req, res) => {
+const { SECRET_KEY } = require('../utils/secret');
+const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
+
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send(users);
     })
     .catch(() => {
-      res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
-    });
+      throw new InternalServerError();
+    })
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
-  const { userId } = req.params;
-
+const getUserById = (userId, res, next) => {
   if (!userId || !isValidObjectId(userId)) {
-    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    next(new BadRequestError());
     return;
   }
 
@@ -36,39 +35,66 @@ module.exports.getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res
-          .status(404)
-          .send(
-            errorBody(
-              `Пользователь по указанному ${req.params.userId} не найден.`,
-            ),
-          );
+        throw new NotFoundError(`Пользователь по указанному ${userId} не найден.`);
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+module.exports.getUserById = (req, res, next) => {
+  const { userId } = req.params;
+  return getUserById(userId, res, next);
+};
 
-  User.create({ name, about, avatar })
+module.exports.getCurrentUser = (req, res, next) => {
+  const { _id: userId } = req.user;
+  return getUserById(userId, res, next);
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
     .then((user) => {
-      res.send(user);
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
+      res.cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true }).end();
+    })
+    .catch(() => {
+      throw new UnauthorizedError();
+    })
+    .catch(next);
+};
+
+module.exports.createUser = (req, res, next) => {
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email, password: hash, name, about, avatar,
+    }))
+    .then((user) => {
+      res.status(HTTP_CODE_CREATED).send(user);
     })
     .catch((err) => {
-      if (err instanceof ValidationError) {
-        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+      if (err.code === 11000) {
+        throw new ConflictError();
+      } else if (err instanceof ValidationError) {
+        throw new BadRequestError();
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
-  const userId = req.user._id;
+module.exports.updateUser = (req, res, next) => {
+  const { _id: userId } = req.user;
   if (!userId || !isValidObjectId(userId)) {
-    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    next(new BadRequestError());
     return;
   }
 
@@ -85,19 +111,20 @@ module.exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+        throw new NotFoundError();
       } else if (err instanceof ValidationError) {
-        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+        throw new BadRequestError();
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
-  const userId = req.user._id;
+module.exports.updateAvatar = (req, res, next) => {
+  const { _id: userId } = req.user;
   if (!userId || !isValidObjectId(userId)) {
-    res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+    next(new BadRequestError());
     return;
   }
 
@@ -110,11 +137,12 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND_ERROR).send(errorBody(NOT_FOUND_ERROR_MESSAGE));
+        throw new NotFoundError();
       } else if (err instanceof ValidationError) {
-        res.status(BAD_REQUEST).send(errorBody(BAD_REQUEST_ERROR_MESSAGE));
+        throw new BadRequestError();
       } else {
-        res.status(INTERNAL_SERVER_ERROR).send(errorBody(INTERNAL_SERVER_ERROR_MESSAGE));
+        throw new InternalServerError();
       }
-    });
+    })
+    .catch(next);
 };
