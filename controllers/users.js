@@ -80,13 +80,13 @@ module.exports.createUser = (req, res, next) => {
       email, password: hash, name, about, avatar,
     }))
     .then((user) => {
-      res.status(HTTP_CODE_CREATED).send(user);
+      res.status(HTTP_CODE_CREATED).send({ data: user });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictError();
+        throw new ConflictError('Пользователь с таким email уже зарегистрирован');
       } else if (err instanceof ValidationError) {
-        throw new BadRequestError();
+        throw new BadRequestError('Неправильные email или пароль');
       } else {
         throw new InternalServerError();
       }

@@ -30,7 +30,7 @@ class BadRequestError extends HttpError {
  * Также эту ошибку возвращает авторизационный middleware, если передан неверный JWT
  */
 class UnauthorizedError extends HttpError {
-  constructor(message = 'Ошибка доступа') {
+  constructor(message = 'Ошибка аутентификации') {
     super('UnauthorizedError', message, HTTP_CODE_UNAUTHORIZED);
   }
 }
@@ -39,7 +39,7 @@ class UnauthorizedError extends HttpError {
  * 403 - попытка удалить чужую карточку
  */
 class ForbiddenError extends HttpError {
-  constructor(message = 'Forbidden') {
+  constructor(message = 'Отказано в доступе') {
     super('ForbiddenError', message, HTTP_CODE_FORBIDDEN);
   }
 }
@@ -57,7 +57,7 @@ class NotFoundError extends HttpError {
  * 409 - при регистрации указан email, который уже существует на сервере
  */
 class ConflictError extends HttpError {
-  constructor(message = 'Пользователь с указанным email уже существует') {
+  constructor(message = 'Объект уже существует') {
     super('ConflictError', message, HTTP_CODE_CONFLICT);
   }
 }

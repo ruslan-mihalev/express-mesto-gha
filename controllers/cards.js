@@ -57,7 +57,7 @@ module.exports.deleteCard = (req, res, next) => {
         return Card.deleteOne({ _id: cardId }).then(() => card);
       }
 
-      throw new ForbiddenError();
+      throw new ForbiddenError('Можно удалять только собственные посты');
     })
     .then((card) => {
       res.send(card);
