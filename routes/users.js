@@ -1,6 +1,3 @@
-const {
-  celebrate, Joi, Segments,
-} = require('celebrate');
 const router = require('express').Router();
 const {
   getCurrentUser,
@@ -9,25 +6,16 @@ const {
   updateUser,
   updateAvatar,
 } = require('../controllers/users');
-const { IMAGE_URL_REGEX, createObjectIdValidator } = require('../utils/validators');
+const {
+  GET_USER,
+  PATCH_USER_ME,
+  PATCH_USER_ME_AVATAR,
+} = require('../utils/validators');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
-router.get('/:userId', celebrate({
-  [Segments.PARAMS]: Joi.object().keys({
-    userId: Joi.string().required().custom(createObjectIdValidator('userId')),
-  }),
-}), getUserById);
-router.patch('/me', celebrate({
-  [Segments.BODY]: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-  }),
-}), updateUser);
-router.patch('/me/avatar', celebrate({
-  [Segments.BODY]: Joi.object().keys({
-    avatar: Joi.string().required().regex(IMAGE_URL_REGEX),
-  }),
-}), updateAvatar);
+router.get('/:userId', GET_USER, getUserById);
+router.patch('/me', PATCH_USER_ME, updateUser);
+router.patch('/me/avatar', PATCH_USER_ME_AVATAR, updateAvatar);
 
 module.exports = router;
