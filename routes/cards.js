@@ -28,7 +28,7 @@ router.put('/:cardId/likes', celebrate({
     cardId: Joi.string().required().custom(createObjectIdValidator('cardId')),
   }),
 }), likeCard);
-router.delete('/:cardId/likes,', celebrate({
+router.delete('/:cardId/likes', celebrate({
   [Segments.PARAMS]: Joi.object().keys({
     cardId: Joi.string().required().custom(createObjectIdValidator('cardId')),
   }),
