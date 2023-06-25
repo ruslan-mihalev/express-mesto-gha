@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongoose').Types;
 
-const IMAGE_URL_REGEX = /^https?:\/\/[w{3}]?[\w\-.]+\.[a-z]{2,}[\(\)\[\]\w\.,;:'~\-\+\*\/=\?!@\$&#]*$/i; //eslint-disable-line
+const IMAGE_URL_REGEX = /^https?:\/\/[w{3}]?[\w\-\.]+\.[a-z]{2,}[\(\)\[\]\w\.,;:'~\-\+\*\/=\?!@\$&#%]*$/i; //eslint-disable-line
 
 /**
  * Original: (https://www.geeksforgeeks.org/how-to-check-if-a-string-is-valid-mongodb-objectid-in-node-js/)
@@ -14,7 +14,7 @@ const isValidObjectId = (id) => {
 
 const createObjectIdValidator = (paramName) => (value, helpers) => {
   if (!isValidObjectId(value)) {
-    return helpers.error(`Invalid param type. "${paramName}" have to be mongoose.Types.ObjectId`);
+    return helpers.message(`Invalid param type. '${paramName}' have to be 'mongoose.Types.ObjectId'`);
   }
 
   return value;

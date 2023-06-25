@@ -41,13 +41,13 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  const { _id: userId } = req.user;
   const { cardId } = req.params;
-
-  if (!cardId || !isValidObjectId(cardId)) {
+  if (!(cardId && isValidObjectId(cardId))) {
     next(new BadRequestError());
     return;
   }
+
+  const { _id: userId } = req.user;
 
   Card.findById(cardId)
     .populate(['owner', 'likes'])
@@ -77,7 +77,7 @@ module.exports.deleteCard = (req, res, next) => {
 
 module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!cardId || !isValidObjectId(cardId)) {
+  if (!(cardId && isValidObjectId(cardId))) {
     next(new BadRequestError());
     return;
   }
@@ -104,7 +104,7 @@ module.exports.likeCard = (req, res, next) => {
 
 module.exports.unlikeCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!cardId || !isValidObjectId(cardId)) {
+  if (!(cardId && isValidObjectId(cardId))) {
     next(new BadRequestError());
     return;
   }

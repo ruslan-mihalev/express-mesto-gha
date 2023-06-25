@@ -29,7 +29,7 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 const getUserById = (userId, res, next) => {
-  if (!userId || !isValidObjectId(userId)) {
+  if (!(userId && isValidObjectId(userId))) {
     next(new BadRequestError());
     return;
   }
@@ -95,7 +95,7 @@ module.exports.createUser = (req, res, next) => {
       email, password: hash, name, about, avatar,
     }))
     .then((user) => {
-      res.status(HTTP_CODE_CREATED).send({ data: user });
+      res.status(HTTP_CODE_CREATED).send({ data: user.copyWithoutPassword() });
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -111,7 +111,7 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.updateUser = (req, res, next) => {
   const { _id: userId } = req.user;
-  if (!userId || !isValidObjectId(userId)) {
+  if (!(userId && isValidObjectId(userId))) {
     next(new BadRequestError());
     return;
   }
@@ -141,7 +141,7 @@ module.exports.updateUser = (req, res, next) => {
 
 module.exports.updateAvatar = (req, res, next) => {
   const { _id: userId } = req.user;
-  if (!userId || !isValidObjectId(userId)) {
+  if (!(userId && isValidObjectId(userId))) {
     next(new BadRequestError());
     return;
   }

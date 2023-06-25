@@ -69,4 +69,9 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     });
 };
 
+userSchema.methods.copyWithoutPassword = function () {
+  const { password, ...userWithoutPassword } = this.toObject();
+  return userWithoutPassword;
+};
+
 module.exports = mongoose.model('user', userSchema);
