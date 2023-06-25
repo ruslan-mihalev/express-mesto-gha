@@ -12,4 +12,12 @@ const isValidObjectId = (id) => {
   return false;
 };
 
-module.exports = { isValidObjectId, IMAGE_URL_REGEX };
+const createObjectIdValidator = (paramName) => (value, helpers) => {
+  if (!isValidObjectId(value)) {
+    return helpers.error(`Invalid param type. "${paramName}" have to be mongoose.Types.ObjectId`);
+  }
+
+  return value;
+};
+
+module.exports = { isValidObjectId, IMAGE_URL_REGEX, createObjectIdValidator };

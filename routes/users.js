@@ -9,11 +9,15 @@ const {
   updateUser,
   updateAvatar,
 } = require('../controllers/users');
-const { IMAGE_URL_REGEX } = require('../utils/validators');
+const { IMAGE_URL_REGEX, createObjectIdValidator } = require('../utils/validators');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
-router.get('/:userId', getUserById);
+router.get('/:userId', celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    userId: Joi.string().required().custom(createObjectIdValidator('userId')),
+  }),
+}), getUserById);
 router.patch('/me', celebrate({
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().min(2).max(30),
