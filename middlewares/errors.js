@@ -1,4 +1,12 @@
 const {
+  DEFAULT_MESSAGE_FOR_HTTP_CODE_BAD_REQUEST,
+  DEFAULT_MESSAGE_FOR_HTTP_CODE_UNAUTHORIZED,
+  DEFAULT_MESSAGE_FOR_HTTP_CODE_FORBIDDEN,
+  DEFAULT_MESSAGE_FOR_HTTP_CODE_NOT_FOUND,
+  DEFAULT_MESSAGE_FOR_HTTP_CODE_CONFLICT,
+  DEFAULT_MESSAGE_FOR_HTTP_CODE_INTERNAL_SERVER_ERROR,
+} = require('../utils/errorMessages');
+const {
   HTTP_CODE_BAD_REQUEST,
   HTTP_CODE_UNAUTHORIZED,
   HTTP_CODE_FORBIDDEN,
@@ -20,7 +28,7 @@ class HttpError extends Error {
  * создания карточки, пользователя, обновления аватара пользователя или профиля
  */
 class BadRequestError extends HttpError {
-  constructor(message = 'Переданы некорректные данные') {
+  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_BAD_REQUEST) {
     super('BadRequestError', message, HTTP_CODE_BAD_REQUEST);
   }
 }
@@ -30,7 +38,7 @@ class BadRequestError extends HttpError {
  * Также эту ошибку возвращает авторизационный middleware, если передан неверный JWT
  */
 class UnauthorizedError extends HttpError {
-  constructor(message = 'Ошибка доступа') {
+  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_UNAUTHORIZED) {
     super('UnauthorizedError', message, HTTP_CODE_UNAUTHORIZED);
   }
 }
@@ -39,7 +47,7 @@ class UnauthorizedError extends HttpError {
  * 403 - попытка удалить чужую карточку
  */
 class ForbiddenError extends HttpError {
-  constructor(message = 'Forbidden') {
+  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_FORBIDDEN) {
     super('ForbiddenError', message, HTTP_CODE_FORBIDDEN);
   }
 }
@@ -48,7 +56,7 @@ class ForbiddenError extends HttpError {
  * 404 - карточка или пользователь не найден или был запрошен несуществующий роут
  */
 class NotFoundError extends HttpError {
-  constructor(message = 'Объект не найден') {
+  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_NOT_FOUND) {
     super('NotFoundError', message, HTTP_CODE_NOT_FOUND);
   }
 }
@@ -57,7 +65,7 @@ class NotFoundError extends HttpError {
  * 409 - при регистрации указан email, который уже существует на сервере
  */
 class ConflictError extends HttpError {
-  constructor(message = 'Пользователь с указанным email уже существует') {
+  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_CONFLICT) {
     super('ConflictError', message, HTTP_CODE_CONFLICT);
   }
 }
@@ -66,7 +74,7 @@ class ConflictError extends HttpError {
  * 500 - ошибка по умолчанию. Сопровождается сообщением: «На сервере произошла ошибка»
  */
 class InternalServerError extends HttpError {
-  constructor(message = 'На сервере произошла ошибка') {
+  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_INTERNAL_SERVER_ERROR) {
     super('InternalServerError', message, HTTP_CODE_INTERNAL_SERVER_ERROR);
   }
 }

@@ -10,6 +10,12 @@ const { isValidObjectId } = require('../utils/validators');
 
 const { SECRET_KEY } = require('../utils/secret');
 const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
+const {
+  WRONG_EMAIL_OR_PASSWORD,
+  USER_WITH_EMAIL_ALREADY_EXISTS,
+} = require('../utils/errorMessages');
+
+const MILLISECONDS_IN_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -60,12 +66,12 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
       res
-        .cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true })
+        .cookie('jwt', token, { maxAge: MILLISECONDS_IN_WEEK, httpOnly: true })
         .send({ email })
         .end();
     })
     .catch(() => {
-      throw new UnauthorizedError();
+      throw new UnauthorizedError(WRONG_EMAIL_OR_PASSWORD);
     })
     .catch(next);
 };
@@ -80,13 +86,13 @@ module.exports.createUser = (req, res, next) => {
       email, password: hash, name, about, avatar,
     }))
     .then((user) => {
-      res.status(HTTP_CODE_CREATED).send(user);
+      res.status(HTTP_CODE_CREATED).send({ data: user });
     })
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictError();
+        throw new ConflictError(USER_WITH_EMAIL_ALREADY_EXISTS);
       } else if (err instanceof ValidationError) {
-        throw new BadRequestError();
+        throw new BadRequestError(WRONG_EMAIL_OR_PASSWORD);
       } else {
         throw new InternalServerError();
       }

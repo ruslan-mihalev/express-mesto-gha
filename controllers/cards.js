@@ -5,6 +5,7 @@ const {
 } = require('../middlewares/errors');
 const { isValidObjectId } = require('../utils/validators');
 const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
+const { ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER } = require('../utils/errorMessages');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -57,7 +58,7 @@ module.exports.deleteCard = (req, res, next) => {
         return Card.deleteOne({ _id: cardId }).then(() => card);
       }
 
-      throw new ForbiddenError();
+      throw new ForbiddenError(ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER);
     })
     .then((card) => {
       res.send(card);
