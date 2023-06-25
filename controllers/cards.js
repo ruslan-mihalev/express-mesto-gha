@@ -49,7 +49,7 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       const { owner: { _id: ownerId } } = card;
       if (ownerId.equals(userId)) {
-        return Card.deleteOne({ _id: cardId }).then(() => card);
+        return card.deleteOne();
       }
 
       throw new ForbiddenError(ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER);
