@@ -70,24 +70,13 @@ class ConflictError extends HttpError {
   }
 }
 
-/**
- * 500 - ошибка по умолчанию. Сопровождается сообщением: «На сервере произошла ошибка»
- */
-class InternalServerError extends HttpError {
-  constructor(message = DEFAULT_MESSAGE_FOR_HTTP_CODE_INTERNAL_SERVER_ERROR) {
-    super('InternalServerError', message, HTTP_CODE_INTERNAL_SERVER_ERROR);
-  }
-}
-
 const errorsHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
-  let httpError;
-  if (!err || !(err instanceof HttpError)) {
-    httpError = new InternalServerError();
+  if (err && err instanceof HttpError) {
+    res.status(err.statusCode).send({ message: err.message });
   } else {
-    httpError = err;
+    res.status(HTTP_CODE_INTERNAL_SERVER_ERROR)
+      .send({ message: DEFAULT_MESSAGE_FOR_HTTP_CODE_INTERNAL_SERVER_ERROR });
   }
-
-  res.status(httpError.statusCode).send({ message: httpError.message });
 };
 
 module.exports = {
@@ -98,5 +87,4 @@ module.exports = {
   ForbiddenError,
   NotFoundError,
   ConflictError,
-  InternalServerError,
 };
