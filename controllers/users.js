@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const User = require('../models/user');
 const {
-  InternalServerError, NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
+  HttpError, InternalServerError, NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
 } = require('../middlewares/errors');
 
 const { isValidObjectId } = require('../utils/validators');
@@ -70,8 +70,12 @@ module.exports.login = (req, res, next) => {
         .send({ email })
         .end();
     })
-    .catch(() => {
-      throw new UnauthorizedError(WRONG_EMAIL_OR_PASSWORD);
+    .catch((err) => {
+      if (err instanceof HttpError) {
+        throw err;
+      } else {
+        throw new UnauthorizedError(WRONG_EMAIL_OR_PASSWORD);
+      }
     })
     .catch(next);
 };

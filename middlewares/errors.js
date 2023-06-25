@@ -92,6 +92,7 @@ const errorsHandler = (err, req, res, next) => { // eslint-disable-line no-unuse
 
 module.exports = {
   errorsHandler,
+  HttpError,
   BadRequestError,
   UnauthorizedError,
   ForbiddenError,

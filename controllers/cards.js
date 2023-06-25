@@ -1,7 +1,7 @@
 const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const Card = require('../models/card');
 const {
-  InternalServerError, BadRequestError, NotFoundError, ForbiddenError,
+  HttpError, InternalServerError, BadRequestError, NotFoundError, ForbiddenError,
 } = require('../middlewares/errors');
 const { isValidObjectId } = require('../utils/validators');
 const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
@@ -66,7 +66,7 @@ module.exports.deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
         throw new NotFoundError();
-      } else if (err instanceof ForbiddenError) {
+      } else if (err instanceof HttpError) {
         throw err;
       } else {
         throw new InternalServerError();
