@@ -1,7 +1,7 @@
 const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const Card = require('../models/card');
 const {
-  HttpError, InternalServerError, BadRequestError, NotFoundError, ForbiddenError,
+  BadRequestError, NotFoundError, ForbiddenError,
 } = require('../middlewares/errors');
 const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
 const { ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER } = require('../utils/errorMessages');
@@ -11,9 +11,6 @@ module.exports.getCards = (req, res, next) => {
     .populate(['owner', 'likes'])
     .then((cards) => {
       res.send(cards);
-    })
-    .catch(() => {
-      throw new InternalServerError();
     })
     .catch(next);
 };
@@ -31,12 +28,11 @@ module.exports.createCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof ValidationError) {
-        throw new BadRequestError();
+        next(new BadRequestError());
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -52,21 +48,18 @@ module.exports.deleteCard = (req, res, next) => {
         return card.deleteOne();
       }
 
-      throw new ForbiddenError(ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER);
+      return Promise.reject(new ForbiddenError(ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER));
     })
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        throw new NotFoundError();
-      } else if (err instanceof HttpError) {
-        throw err;
+        next(new NotFoundError());
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -84,12 +77,11 @@ module.exports.likeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.unlikeCard = (req, res, next) => {
@@ -107,10 +99,9 @@ module.exports.unlikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };

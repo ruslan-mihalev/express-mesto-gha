@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const { DocumentNotFoundError, ValidationError } = require('mongoose').Error;
 const User = require('../models/user');
 const {
-  HttpError, InternalServerError, NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
+  HttpError, NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
 } = require('../middlewares/errors');
 
 const { SECRET_KEY } = require('../utils/secret');
@@ -20,9 +20,6 @@ module.exports.getUsers = (req, res, next) => {
     .then((users) => {
       res.send(users);
     })
-    .catch(() => {
-      throw new InternalServerError();
-    })
     .catch(next);
 };
 
@@ -34,12 +31,11 @@ const getUserById = (userId, res, next) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        throw new NotFoundError(`Пользователь по указанному ${userId} не найден.`);
+        next(new NotFoundError(`Пользователь по указанному ${userId} не найден.`));
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -65,12 +61,11 @@ module.exports.login = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof HttpError) {
-        throw err;
+        next(err);
       } else {
-        throw new UnauthorizedError(WRONG_EMAIL_OR_PASSWORD);
+        next(new UnauthorizedError(WRONG_EMAIL_OR_PASSWORD));
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -87,14 +82,13 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        throw new ConflictError(USER_WITH_EMAIL_ALREADY_EXISTS);
+        next(new ConflictError(USER_WITH_EMAIL_ALREADY_EXISTS));
       } else if (err instanceof ValidationError) {
-        throw new BadRequestError(WRONG_EMAIL_OR_PASSWORD);
+        next(new BadRequestError(WRONG_EMAIL_OR_PASSWORD));
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -112,14 +106,13 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       } else if (err instanceof ValidationError) {
-        throw new BadRequestError();
+        next(new BadRequestError());
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -133,12 +126,11 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        throw new NotFoundError();
+        next(new NotFoundError());
       } else if (err instanceof ValidationError) {
-        throw new BadRequestError();
+        next(new BadRequestError());
       } else {
-        throw new InternalServerError();
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
