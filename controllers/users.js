@@ -59,7 +59,10 @@ module.exports.login = (req, res, next) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
-      res.cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true }).end();
+      res
+        .cookie('jwt', token, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true })
+        .send({ email })
+        .end();
     })
     .catch(() => {
       throw new UnauthorizedError();
