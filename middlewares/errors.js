@@ -30,7 +30,7 @@ class BadRequestError extends HttpError {
  * Также эту ошибку возвращает авторизационный middleware, если передан неверный JWT
  */
 class UnauthorizedError extends HttpError {
-  constructor(message = 'Unauthorized') {
+  constructor(message = 'Ошибка доступа') {
     super('UnauthorizedError', message, HTTP_CODE_UNAUTHORIZED);
   }
 }
