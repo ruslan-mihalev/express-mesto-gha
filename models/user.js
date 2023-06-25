@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
-const { BadRequestError, UnauthorizedError } = require('../middlewares/errors');
+const { UnauthorizedError } = require('../middlewares/errors');
 const { WRONG_EMAIL_OR_PASSWORD } = require('../utils/errorMessages');
 const { IMAGE_URL_REGEX } = require('../utils/validators');
 
@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minlength: 8,
     required: true,
     select: false,
   },
@@ -48,10 +47,6 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.findUserByCredentials = function (email, password) {
-  if (!(email && validator.isEmail(email) && password)) {
-    return Promise.reject(new BadRequestError(WRONG_EMAIL_OR_PASSWORD));
-  }
-
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {

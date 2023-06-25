@@ -20,4 +20,4 @@ const createObjectIdValidator = (paramName) => (value, helpers) => {
   return value;
 };
 
-module.exports = { isValidObjectId, IMAGE_URL_REGEX, createObjectIdValidator };
+module.exports = { IMAGE_URL_REGEX, createObjectIdValidator };

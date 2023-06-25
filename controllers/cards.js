@@ -3,7 +3,6 @@ const Card = require('../models/card');
 const {
   HttpError, InternalServerError, BadRequestError, NotFoundError, ForbiddenError,
 } = require('../middlewares/errors');
-const { isValidObjectId } = require('../utils/validators');
 const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
 const { ATTEMPT_TO_DELETE_CARD_FOR_ANOTHER_USER } = require('../utils/errorMessages');
 
@@ -42,11 +41,6 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!(cardId && isValidObjectId(cardId))) {
-    next(new BadRequestError());
-    return;
-  }
-
   const { _id: userId } = req.user;
 
   Card.findById(cardId)
@@ -77,10 +71,6 @@ module.exports.deleteCard = (req, res, next) => {
 
 module.exports.likeCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!(cardId && isValidObjectId(cardId))) {
-    next(new BadRequestError());
-    return;
-  }
 
   Card.findByIdAndUpdate(
     cardId,
@@ -104,10 +94,6 @@ module.exports.likeCard = (req, res, next) => {
 
 module.exports.unlikeCard = (req, res, next) => {
   const { cardId } = req.params;
-  if (!(cardId && isValidObjectId(cardId))) {
-    next(new BadRequestError());
-    return;
-  }
 
   Card.findByIdAndUpdate(
     cardId,
