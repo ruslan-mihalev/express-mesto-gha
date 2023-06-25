@@ -85,6 +85,11 @@ module.exports.createUser = (req, res, next) => {
     email, password, name, about, avatar,
   } = req.body;
 
+  if (!(email && password)) {
+    next(new BadRequestError(WRONG_EMAIL_OR_PASSWORD));
+    return;
+  }
+
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       email, password: hash, name, about, avatar,
