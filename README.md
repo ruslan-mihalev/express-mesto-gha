@@ -11,6 +11,9 @@
   
 Остальные директории вспомогательные, создаются при необходимости разработчиком
 
+## Secret key generation
+`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+
 ## Запуск проекта
 
 `npm run start` — запускает сервер   

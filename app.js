@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const {
   celebrate, errors, Joi, Segments,
 } = require('celebrate');

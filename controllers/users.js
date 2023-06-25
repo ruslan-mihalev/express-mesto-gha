@@ -6,7 +6,6 @@ const {
   HttpError, NotFoundError, BadRequestError, UnauthorizedError, ConflictError,
 } = require('../middlewares/errors');
 
-const { SECRET_KEY } = require('../utils/secret');
 const { HTTP_CODE_CREATED } = require('../utils/httpCodes');
 const {
   WRONG_EMAIL_OR_PASSWORD,
@@ -53,7 +52,7 @@ module.exports.login = (req, res, next) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
       res
         .cookie('jwt', token, { maxAge: MILLISECONDS_IN_WEEK, httpOnly: true })
         .send({ email })
