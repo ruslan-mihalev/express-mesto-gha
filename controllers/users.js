@@ -90,13 +90,10 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
-module.exports.updateUser = (req, res, next) => {
-  const { _id: userId } = req.user;
-  const { name, about } = req.body;
-
+const updateUser = (userId, patch, res, next) => {
   User.findByIdAndUpdate(
     userId,
-    { name, about },
+    patch,
     { new: true, runValidators: true },
   )
     .orFail()
@@ -114,22 +111,14 @@ module.exports.updateUser = (req, res, next) => {
     });
 };
 
+module.exports.updateUser = (req, res, next) => {
+  const { _id: userId } = req.user;
+  const { name, about } = req.body;
+  updateUser(userId, { name, about }, res, next);
+};
+
 module.exports.updateAvatar = (req, res, next) => {
   const { _id: userId } = req.user;
   const { avatar } = req.body;
-
-  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .orFail()
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err instanceof DocumentNotFoundError) {
-        next(new NotFoundError());
-      } else if (err instanceof ValidationError) {
-        next(new BadRequestError());
-      } else {
-        next(err);
-      }
-    });
+  updateUser(userId, { avatar }, res, next);
 };
